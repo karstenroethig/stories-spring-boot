@@ -1,0 +1,18 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html>
+	<head>
+	</head>
+<body>
+
+	<footer class="bs-docs-footer" role="contetninfo">
+		<div class="container">
+			<p>
+				<span th:text="#{layout.footer.copyright.text(${#dates.format(#dates.createNow(),'yyyy')},#{application.vendor})}"></span>
+				|
+				<span th:text="#{application.version}"></span>
+			</p>
+		</div>
+	</footer>
+
+</body>
+</html>

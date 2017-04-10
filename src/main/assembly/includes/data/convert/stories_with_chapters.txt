@@ -1,0 +1,18 @@
+= story no. 1 =
+
+== chapter 1 ==
+
+Zeile 1
+Zeile 2
+usw.
+
+== chapter 2 ==
+Zeile 1
+Zeile 2
+Zeile 3
+
+= story 2 =
+== ch. 1 ==
+Text
+== ch. 2 ==
+Text

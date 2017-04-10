@@ -1,0 +1,42 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+	<title th:text="#{default.list.label}"></title>
+</head>
+<body th:with="menu='list'">
+
+	<div layout:fragment="content">
+
+		<div class="bs-docs-header" id="content" tabindex="-1">
+			<div class="container">
+				<h1 th:text="#{default.list.label}"></h1>
+			</div>
+		</div>
+		
+		<div class="container bs-docs-container">
+			<div class="row">
+	
+				<table class="table table-striped">
+					<thead>
+						<th th:text="#{story.title.label}"></th>
+						<th th:text="#{story.language.label}"></th>
+						<th th:text="#{story.plot.label}"></th>
+					</thead>
+					<tbody>
+						<tr th:each="story : ${allStories}">
+							<td>
+								<a th:href="@{/story/show/{key}(key=${story.key})}" th:text="${story.title}"></a>
+							</td>
+							<td th:text="${story.language}"></td>
+							<td th:text="${story.plot}"></td>
+						</tr>
+					</tbody>
+				</table>
+	
+			</div>
+		</div>
+
+	</div>
+
+</body>
+</html>

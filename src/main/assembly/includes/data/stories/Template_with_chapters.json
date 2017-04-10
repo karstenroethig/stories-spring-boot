@@ -1,0 +1,28 @@
+{
+	"title": "Template with chapters",
+	"subtitle": "",
+	"comment": "",
+	"chapters": [
+		{
+			"title": "Chapter 1",
+			"subtitle": "TODO",
+			"comment": "TODO",
+			"paragraphs": [
+				"Zeile 1",
+				"\"Zeile 2\"",
+				"Zeile 3",
+				"Zeile 4"
+			]
+		},
+		{
+			"title": "Chapter 2",
+			"subtitle": "TODO",
+			"comment": "TODO",
+			"paragraphs": [
+				"Zeile 1",
+				"\"Zeile 2\"",
+				"Zeile 3"
+			]
+		}
+	]
+}

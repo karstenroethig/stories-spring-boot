@@ -1,0 +1,63 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+	<title th:text="#{default.show.label}"></title>
+</head>
+<body th:with="menu='show'">
+
+	<div layout:fragment="content">
+	
+		<div class="bs-docs-header" id="content" tabindex="-1">
+			<div class="container">
+				<h1 th:text="${story.title}"></h1>
+				<!--p>TODO</p-->
+			</div>
+		</div>
+		
+		<div class="container bs-docs-container">
+		
+			<div class="row" th:if="${!#lists.isEmpty(story.chapters)}">
+				<div class="col-md-9" role="main">
+					<div class="bs-docs-section" th:each="chapter : ${story.chapters}">
+						<h1 th:id="${chapter.key}" class="page-header">
+							<a class="anchorjs-link " th:href="'#'+${chapter.key}" style="font-style: normal; font-variant: normal; font-weight: normal; position: absolute; margin-left: -1em; padding-right: 0.5em;"></a>
+							<span th:text="${chapter.title}"></span>
+						</h1>
+						<p class="lead" th:if="${chapter.subtitle}" th:text="${chapter.subtitle}"></p>
+						<div class="bs-callout bs-callout-warning" id="jquery-required" th:if="${chapter.comment}">
+							<p th:text="${chapter.comment}"></p>
+						</div>
+						<p th:each="paragraph : ${chapter.paragraphs}" th:text="${paragraph}"></p>
+					</div>
+				</div>
+				<div class="col-md-3" role="complementary">
+					<nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix-top">
+						<ul class="nav bs-docs-sidenav">
+							<li class="" th:each="chapter : ${story.chapters}">
+								<a th:href="'#'+${chapter.key}">
+									<span th:text="${chapter.title}"></span>
+								</a>
+							</li>
+						</ul>
+						<a class="back-to-top" href="#top"> Back to top </a>
+					</nav>
+				</div>
+			</div>
+		
+			<div class="row" th:if="${!#lists.isEmpty(story.paragraphs)}">
+				<div class="col-md-12" role="main">
+					<div class="bs-docs-section">
+						<p class="lead" th:if="${story.subtitle}" th:text="${story.subtitle}"></p>
+						<div class="bs-callout bs-callout-warning" id="jquery-required" th:if="${story.comment}">
+							<p th:text="${story.comment}"></p>
+						</div>
+						<p th:each="paragraph : ${story.paragraphs}" th:text="${paragraph}"></p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+</body>
+</html>

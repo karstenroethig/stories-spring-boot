@@ -1,0 +1,27 @@
+##
+## Spring Boot configuration for production
+##
+## Spring Boot configuration options
+## https://github.com/spring-projects/spring-boot/blob/master/spring-boot-docs/src/main/asciidoc/appendix-application-properties.adoc
+##
+
+##
+## Defaults
+## --> verschiedene Grundeinstellungen und Voreinstellungen für die direkte Ausführung in der Eclipse
+##
+
+server:
+  port: 2080
+
+spring:
+  resources:
+    chain:
+      cache: true
+      html-application-cache: true
+      strategy:
+        content:
+          enabled: true
+          paths: /css/**, /images/**, /js/**
+
+  thymeleaf:
+    mode: LEGACYHTML5

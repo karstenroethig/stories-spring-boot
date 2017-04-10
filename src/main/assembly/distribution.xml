@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<assembly>
+	<id>zip</id>
+	<formats>
+		<format>tar.gz</format>
+		<format>zip</format>
+	</formats>
+	
+	<dependencySets>
+		<dependencySet>
+			<!--outputDirectory>lib</outputDirectory-->
+			<outputDirectory></outputDirectory>
+			<!--outputFileNameMapping>${artifact.artifactId}-${artifact.version}.${artifact.extension}</outputFileNameMapping-->
+			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+			<unpack>false</unpack>
+			<scope>runtime</scope>
+			<includes>
+				<include>${project.groupId}:${project.artifactId}</include>
+			</includes>
+		</dependencySet>
+	</dependencySets>
+	
+	<fileSets>
+		<fileSet>
+			<directory>src/main/assembly/includes</directory>
+			<outputDirectory></outputDirectory>
+			<includes>
+				<include>**/*</include>
+			</includes>
+			<filtered>true</filtered>
+		</fileSet>
+	</fileSets>
+</assembly>
