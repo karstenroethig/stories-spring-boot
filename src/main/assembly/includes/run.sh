@@ -3,7 +3,7 @@
 DIRNAME=`dirname "$0"`
 
 # Setup APP_HOME
-APP_HOME=`cd "$DIRNAME/.." >/dev/null; pwd`
+APP_HOME=`cd "$DIRNAME/." >/dev/null; pwd`
 
 # Read an optional running configuration file
 if [ "x$RUN_CONF" = "x" ]; then
@@ -25,7 +25,7 @@ fi
 # Display our environment
 echo "========================================================================="
 echo ""
-echo "  ${app.name.pretty} Bootstrap Environment"
+echo "  ${project.name} Bootstrap Environment"
 echo ""
 echo "  Home Directory: $APP_HOME"
 echo ""

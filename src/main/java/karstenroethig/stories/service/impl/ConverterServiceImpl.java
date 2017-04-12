@@ -99,10 +99,16 @@ public class ConverterServiceImpl {
             if( StringUtils.startsWith( filteredLine, "=" ) ) {
 
                 if( story != null ) {
+
+                    if( chapter != null ) {
+                        story.addChapter( chapter );
+                    }
+
                     stories.add( story );
                 }
 
                 story = new StoryShowDto();
+                chapter = null;
 
                 story.setTitle( filterLine( StringUtils.replace( filteredLine, "=", StringUtils.EMPTY ) ) );
 
@@ -118,6 +124,11 @@ public class ConverterServiceImpl {
         }
 
         if( story != null ) {
+
+            if( chapter != null ) {
+                story.addChapter( chapter );
+            }
+
             stories.add( story );
         }
 
