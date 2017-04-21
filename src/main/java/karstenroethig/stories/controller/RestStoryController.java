@@ -1,58 +1,45 @@
 package karstenroethig.stories.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
 import karstenroethig.stories.controller.exceptions.NotFoundException;
-import karstenroethig.stories.dto.StoryShowDto;
+import karstenroethig.stories.dto.StoryWordsDto;
 import karstenroethig.stories.service.StoryService;
 
 
-@ComponentScan
-@Controller
-@RequestMapping( "/story" )
-public class StoryController {
+@RestController
+@RequestMapping( "/rest/1.0/stories" )
+public class RestStoryController {
 
     @Autowired
     StoryService storyService;
 
     @RequestMapping(
-        value = "/list",
-        method = RequestMethod.GET
+        value = "/{key}/words",
+        method = RequestMethod.GET,
+        produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public String list( Model model ) {
+    public ResponseEntity<StoryWordsDto> words( @PathVariable( "key" ) String storyKey ) {
 
-        model.addAttribute( "allStories", storyService.getAllStories() );
+        StoryWordsDto data = storyService.countStoryWords( storyKey );
 
-        return "views/story/list";
-    }
-
-    @RequestMapping(
-        value = "/show/{key}",
-        method = RequestMethod.GET
-    )
-    public String show( @PathVariable( "key" ) String storyKey, Model model ) throws NotFoundException {
-
-        StoryShowDto story = storyService.findStory( storyKey );
-
-        if( story == null ) {
+        if( data == null ) {
             throw new NotFoundException( storyKey );
         }
 
-        model.addAttribute( "story", story );
-
-        return "views/story/show";
+        return new ResponseEntity<StoryWordsDto>( data, HttpStatus.OK );
     }
 
     @ExceptionHandler( NotFoundException.class )

@@ -12,13 +12,14 @@
 				<h1 th:text="#{default.list.label}"></h1>
 			</div>
 		</div>
-		
+
 		<div class="container bs-docs-container">
 			<div class="row">
-	
+
 				<table class="table table-striped">
 					<thead>
 						<th th:text="#{story.title.label}"></th>
+						<th th:text="#{story.words.label}" class="text-right"></th>
 						<th th:text="#{story.language.label}"></th>
 						<th th:text="#{story.plot.label}"></th>
 					</thead>
@@ -27,12 +28,18 @@
 							<td>
 								<a th:href="@{/story/show/{key}(key=${story.key})}" th:text="${story.title}"></a>
 							</td>
+							<td class="text-right ajaxWordcount" th:attr="data-key=${story.key}">
+								<i class="fa fa-question" title="Suche startet automatisch nach 5 Sekunden"></i>
+<!-- 								<i class="fa fa-spinner fa-spin"></i> -->
+<!-- 								<i class="fa fa-exclamation-circle" style="color: red;" title="Fehlermeldung"></i> -->
+<!-- 								1.245 -->
+							</td>
 							<td th:text="${story.language}"></td>
 							<td th:text="${story.plot}"></td>
 						</tr>
 					</tbody>
 				</table>
-	
+
 			</div>
 		</div>
 
