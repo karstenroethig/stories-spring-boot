@@ -6,12 +6,11 @@ import karstenroethig.stories.dto.StoryListDto;
 import karstenroethig.stories.dto.StoryShowDto;
 import karstenroethig.stories.dto.StoryWordsDto;
 
+public interface StoryService
+{
+	public StoryShowDto findStory( String key );
 
-public interface StoryService {
+	public Collection<StoryListDto> getAllStories();
 
-    public StoryShowDto findStory( String key );
-
-    public Collection<StoryListDto> getAllStories();
-
-    public StoryWordsDto countStoryWords( String key );
+	public StoryWordsDto countStoryWords( String key );
 }

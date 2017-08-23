@@ -23,218 +23,232 @@ import karstenroethig.stories.dto.StoryWordsDto;
 import karstenroethig.stories.service.StoryService;
 import lombok.extern.slf4j.Slf4j;
 
-
 @Service
 @Slf4j
-public class StoryServiceImpl implements StoryService {
+public class StoryServiceImpl implements StoryService
+{
+	@Override
+	public List<StoryListDto> getAllStories()
+	{
+		List<StoryListDto> stories = new ArrayList<StoryListDto>();
 
-    @Override
-    public List<StoryListDto> getAllStories() {
+		Path path = Paths.get( "data/stories.json" );
 
-        List<StoryListDto> stories = new ArrayList<StoryListDto>();
+		// exists?
+		if ( Files.notExists( path ) )
+		{
+			log.warn( path.toAbsolutePath().toString() + " does not exist." );
 
-        Path path = Paths.get( "data/stories.json" );
+			return stories;
+		}
 
-        // exists?
-        if( Files.notExists( path ) ) {
-            log.warn( path.toAbsolutePath().toString() + " does not exist." );
+		// read content
+		String content = null;
 
-            return stories;
-        }
+		try
+		{
+			byte[] bytes = Files.readAllBytes( path );
+			content = new String( bytes, StandardCharsets.UTF_8 );
+		}
+		catch ( IOException ex )
+		{
+			log.error( "error reading file " + path.toString(), ex );
 
-        // read content
-        String content = null;
+			return stories;
+		}
 
-        try {
-            byte[] bytes = Files.readAllBytes( path );
-            content = new String( bytes, StandardCharsets.UTF_8 );
-        } catch( IOException ex ) {
-            log.error( "error reading file " + path.toString(), ex );
+		JSONArray jsonStories = new JSONArray( content );
 
-            return stories;
-        }
+		for ( int i = 0; i < jsonStories.length(); i++ )
+		{
+			JSONObject jsonStory = jsonStories.getJSONObject( i );
+			StoryListDto story = new StoryListDto();
 
-        JSONArray jsonStories = new JSONArray( content );
+			story.setTitle( jsonStory.getString( "title" ) );
+			story.setLanguage( jsonStory.getString( "language" ) );
+			story.setPlot( jsonStory.getString( "plot" ) );
 
-        for( int i = 0; i < jsonStories.length(); i++ ) {
+			story.setKey( generateKey( story.getTitle() ) );
 
-            JSONObject jsonStory = jsonStories.getJSONObject( i );
-            StoryListDto story = new StoryListDto();
+			stories.add( story );
+		}
 
-            story.setTitle( jsonStory.getString( "title" ) );
-            story.setLanguage( jsonStory.getString( "language" ) );
-            story.setPlot( jsonStory.getString( "plot" ) );
+		Collections.sort( stories, new Comparator<StoryListDto>()
+		{
+			@Override
+			public int compare( StoryListDto o1, StoryListDto o2 )
+			{
+				return o1.getTitle().compareTo( o2.getTitle() );
+			}
+		} );
 
-            story.setKey( generateKey( story.getTitle() ) );
+		return stories;
+	}
 
-            stories.add( story );
-        }
+	@Override
+	public StoryShowDto findStory( String key )
+	{
+		// read content
+		String content = findStoryContent( key );
 
-        Collections.sort( stories, new Comparator<StoryListDto>() {
-                @Override
-                public int compare( StoryListDto o1, StoryListDto o2 ) {
-                    return o1.getTitle().compareTo( o2.getTitle() );
-                }
-            } );
+		if ( StringUtils.isBlank( content ) )
+		{
+			return null;
+		}
 
-        return stories;
-    }
+		JSONObject jsonStory = new JSONObject( content );
+		StoryShowDto story = new StoryShowDto();
 
-    @Override
-    public StoryShowDto findStory( String key ) {
+		story.setTitle( jsonStory.getString( "title" ) );
+		story.setSubtitle( readOptionalString( jsonStory, "subtitle", null ) );
+		story.setComment( readOptionalString( jsonStory, "comment", null ) );
 
-        // read content
-        String content = findStoryContent( key );
-        
-        if( StringUtils.isBlank( content ) ) {
-            return null;
-        }
+		if ( jsonStory.has( "paragraphs" ) )
+		{
+			JSONArray jsonParagraphs = jsonStory.getJSONArray( "paragraphs" );
 
-        JSONObject jsonStory = new JSONObject( content );
-        StoryShowDto story = new StoryShowDto();
+			for ( int i = 0; i < jsonParagraphs.length(); i++ )
+			{
+				String paragraph = jsonParagraphs.getString( i );
 
-        story.setTitle( jsonStory.getString( "title" ) );
-        story.setSubtitle( readOptionalString( jsonStory, "subtitle", null ) );
-        story.setComment( readOptionalString( jsonStory, "comment", null ) );
+				story.addParagraph( paragraph );
+			}
+		}
 
-        if( jsonStory.has( "paragraphs" ) ) {
+		if ( jsonStory.has( "chapters" ) )
+		{
+			JSONArray jsonChapters = jsonStory.getJSONArray( "chapters" );
 
-        	JSONArray jsonParagraphs = jsonStory.getJSONArray( "paragraphs" );
+			for ( int i = 0; i < jsonChapters.length(); i++ )
+			{
+				JSONObject jsonChapter = jsonChapters.getJSONObject( i );
+				ChapterDto chapter = new ChapterDto();
 
-        	for( int i = 0; i < jsonParagraphs.length(); i++ ) {
+				chapter.setTitle( jsonChapter.getString( "title" ) );
+				chapter.setSubtitle( readOptionalString( jsonChapter, "subtitle", null ) );
+				chapter.setComment( readOptionalString( jsonChapter, "comment", null ) );
 
-        		String paragraph = jsonParagraphs.getString( i );
-        		
-        		story.addParagraph( paragraph );
-        	}
-        }
-        
-        if( jsonStory.has( "chapters" ) ) {
-        	
-        	JSONArray jsonChapters = jsonStory.getJSONArray( "chapters" );
-        	
-        	for( int i = 0; i < jsonChapters.length(); i++ ) {
+				if ( jsonChapter.has( "paragraphs" ) )
+				{
+					JSONArray jsonParagraphs = jsonChapter.getJSONArray( "paragraphs" );
 
-                JSONObject jsonChapter = jsonChapters.getJSONObject( i );
-                ChapterDto chapter = new ChapterDto();
-                
-                chapter.setTitle( jsonChapter.getString( "title" ) );
-                chapter.setSubtitle( readOptionalString( jsonChapter, "subtitle", null ) );
-                chapter.setComment( readOptionalString( jsonChapter, "comment", null ) );
-                
-                if( jsonChapter.has( "paragraphs" ) ) {
-                	
-                	JSONArray jsonParagraphs = jsonChapter.getJSONArray( "paragraphs" );
-                	
-                	for( int j = 0; j < jsonParagraphs.length(); j++ ) {
+					for ( int j = 0; j < jsonParagraphs.length(); j++ )
+					{
+						String paragraph = jsonParagraphs.getString( j );
 
-                		String paragraph = jsonParagraphs.getString( j );
-                		
-                		chapter.addParagraph( paragraph );
-                	}
-                }
-                
-                chapter.setKey( generateKey( chapter.getTitle() ) );
-                
-                story.addChapter( chapter );
-        	}
-        }
+						chapter.addParagraph( paragraph );
+					}
+				}
 
-        return story;
-    }
-    
-    @Override
-    public StoryWordsDto countStoryWords( String key ) {
+				chapter.setKey( generateKey( chapter.getTitle() ) );
 
-        // read content
-        String content = findStoryContent( key );
+				story.addChapter( chapter );
+			}
+		}
 
-        if( StringUtils.isBlank( content ) ) {
-            return null;
-        }
+		return story;
+	}
 
-        // count all the words
-        int words = countWords( content );
+	@Override
+	public StoryWordsDto countStoryWords( String key )
+	{
+		// read content
+		String content = findStoryContent( key );
 
-        StoryWordsDto data = new StoryWordsDto();
+		if ( StringUtils.isBlank( content ) )
+		{
+			return null;
+		}
 
-        data.setWords( NumberFormat.getInstance().format( words ) );
+		// count all the words
+		int words = countWords( content );
 
-        return data;
-    }
-    
-    private String findStoryContent( String key ) {
+		StoryWordsDto data = new StoryWordsDto();
 
-        Path path = Paths.get( "data/stories/" + key + ".json" );
+		data.setWords( NumberFormat.getInstance().format( words ) );
 
-        // exists?
-        if( Files.notExists( path ) ) {
-            log.error( path.toAbsolutePath().toString() + " does not exist." );
-            
-            return null;
-        }
+		return data;
+	}
 
-        // read content
-        try {
-            byte[] bytes = Files.readAllBytes( path );
-            
-            return new String( bytes, StandardCharsets.UTF_8 );
+	private String findStoryContent( String key )
+	{
+		Path path = Paths.get( "data/stories/" + key + ".json" );
 
-        } catch( IOException ex ) {
-            log.error( "error reading file " + path.toString(), ex );
-        }
+		// exists?
+		if ( Files.notExists( path ) )
+		{
+			log.error( path.toAbsolutePath().toString() + " does not exist." );
 
-        return null;
-    }
-    
-    private String readOptionalString( JSONObject jsonObject, String key, String defaultValue ) {
-    	
-    	if( jsonObject == null || StringUtils.isBlank( key ) || jsonObject.has( key ) == false ) {
-    		return defaultValue;
-    	}
-    	
-    	return jsonObject.getString( key );
-    }
+			return null;
+		}
 
-    public static String generateKey( String oldKey ) {
+		// read content
+		try
+		{
+			byte[] bytes = Files.readAllBytes( path );
 
-        String newKey = StringUtils.replaceChars( oldKey, ' ', '_' );
-        newKey = StringUtils.replaceChars( newKey, ".", "_" );
-        newKey = StringUtils.replaceChars( newKey, "ß", "ss" );
-        newKey = StringUtils.replaceChars( newKey, "ä", "ae" );
-        newKey = StringUtils.replaceChars( newKey, "ü", "ue" );
-        newKey = StringUtils.replaceChars( newKey, "ö", "oe" );
-        newKey = StringUtils.replaceChars( newKey, "Ä", "Ae" );
-        newKey = StringUtils.replaceChars( newKey, "Ü", "Ue" );
-        newKey = StringUtils.replaceChars( newKey, "Ö", "Oe" );
+			return new String( bytes, StandardCharsets.UTF_8 );
+		}
+		catch ( IOException ex )
+		{
+			log.error( "error reading file " + path.toString(), ex );
+		}
 
-        return newKey;
-    }
-    
-    private static int countWords( String text ){
+		return null;
+	}
 
-        int wordCount = 0;
+	private String readOptionalString( JSONObject jsonObject, String key, String defaultValue )
+	{
+		if ( jsonObject == null || StringUtils.isBlank( key ) || jsonObject.has( key ) == false )
+		{
+			return defaultValue;
+		}
 
-        boolean word = false;
-        int endOfLine = text.length() - 1;
+		return jsonObject.getString( key );
+	}
 
-        for( int i = 0; i < text.length(); i++ ) {
+	public static String generateKey( String oldKey )
+	{
+		String newKey = StringUtils.replaceChars( oldKey, ' ', '_' );
+		newKey = StringUtils.replaceChars( newKey, ".", "_" );
+		newKey = StringUtils.replaceChars( newKey, "ß", "ss" );
+		newKey = StringUtils.replaceChars( newKey, "ä", "ae" );
+		newKey = StringUtils.replaceChars( newKey, "ü", "ue" );
+		newKey = StringUtils.replaceChars( newKey, "ö", "oe" );
+		newKey = StringUtils.replaceChars( newKey, "Ä", "Ae" );
+		newKey = StringUtils.replaceChars( newKey, "Ü", "Ue" );
+		newKey = StringUtils.replaceChars( newKey, "Ö", "Oe" );
 
-            // if the char is a letter, word = true.
-            if( Character.isLetter( text.charAt( i ) ) && i != endOfLine ) {
-                word = true;
+		return newKey;
+	}
 
-            // if char isn't a letter and there have been letters before, counter goes up.
-            } else if( Character.isLetter( text.charAt( i ) ) == false && word ) {
-                wordCount++;
-                word = false;
+	private static int countWords( String text )
+	{
+		int wordCount = 0;
 
-            // last word of String; if it doesn't end with a non letter, it wouldn't count without this.
-            } else if( Character.isLetter( text.charAt( i ) ) && i == endOfLine ) {
-                wordCount++;
-            }
-        }
+		boolean word = false;
+		int endOfLine = text.length() - 1;
 
-        return wordCount;
-    }
+		for ( int i = 0; i < text.length(); i++ )
+		{
+			// if the char is a letter, word = true.
+			if ( Character.isLetter( text.charAt( i ) ) && i != endOfLine )
+			{
+				word = true;
+			}
+			// if char isn't a letter and there have been letters before, counter goes up.
+			else if ( Character.isLetter( text.charAt( i ) ) == false && word )
+			{
+				wordCount++;
+				word = false;
+			}
+			// last word of String; if it doesn't end with a non letter, it wouldn't count without this.
+			else if ( Character.isLetter( text.charAt( i ) ) && i == endOfLine )
+			{
+				wordCount++;
+			}
+		}
+
+		return wordCount;
+	}
 }

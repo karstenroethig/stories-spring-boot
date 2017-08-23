@@ -13,19 +13,21 @@ import java.util.List;
 @NoArgsConstructor
 @Setter
 @ToString
-public class StoryShowDto {
+public class StoryShowDto
+{
+	private String title;
+	private String subtitle;
+	private String comment;
+	private List<String> paragraphs = new ArrayList<String>();
+	private List<ChapterDto> chapters = new ArrayList<ChapterDto>();
 
-    private String title;
-    private String subtitle;
-    private String comment;
-    private List<String> paragraphs = new ArrayList<String>();
-    private List<ChapterDto> chapters = new ArrayList<ChapterDto>();
+	public void addParagraph( String paragraph )
+	{
+		paragraphs.add( paragraph );
+	}
 
-    public void addParagraph( String paragraph ) {
-        paragraphs.add( paragraph );
-    }
-
-    public void addChapter( ChapterDto chapter ) {
-        chapters.add( chapter );
-    }
+	public void addChapter( ChapterDto chapter )
+	{
+		chapters.add( chapter );
+	}
 }

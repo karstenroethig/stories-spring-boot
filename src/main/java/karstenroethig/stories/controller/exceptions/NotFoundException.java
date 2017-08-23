@@ -1,12 +1,12 @@
 package karstenroethig.stories.controller.exceptions;
 
-public class NotFoundException extends RuntimeException {
+public class NotFoundException extends RuntimeException
+{
+	/** serialVersionUID. */
+	private static final long serialVersionUID = -4981372980250366741L;
 
-    /** serialVersionUID. */
-    private static final long serialVersionUID = -4981372980250366741L;
-
-    public NotFoundException( String message ) {
-        super( message );
-    }
-
+	public NotFoundException( String message )
+	{
+		super( message );
+	}
 }

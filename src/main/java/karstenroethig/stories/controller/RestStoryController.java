@@ -18,33 +18,33 @@ import karstenroethig.stories.controller.exceptions.NotFoundException;
 import karstenroethig.stories.dto.StoryWordsDto;
 import karstenroethig.stories.service.StoryService;
 
-
 @RestController
 @RequestMapping( "/rest/1.0/stories" )
-public class RestStoryController {
+public class RestStoryController
+{
+	@Autowired
+	StoryService storyService;
 
-    @Autowired
-    StoryService storyService;
+	@RequestMapping(
+		value = "/{key}/words",
+		method = RequestMethod.GET,
+		produces = MediaType.APPLICATION_JSON_VALUE
+	)
+	public ResponseEntity<StoryWordsDto> words( @PathVariable( "key" ) String storyKey )
+	{
+		StoryWordsDto data = storyService.countStoryWords( storyKey );
 
-    @RequestMapping(
-        value = "/{key}/words",
-        method = RequestMethod.GET,
-        produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<StoryWordsDto> words( @PathVariable( "key" ) String storyKey ) {
+		if ( data == null )
+		{
+			throw new NotFoundException( storyKey );
+		}
 
-        StoryWordsDto data = storyService.countStoryWords( storyKey );
+		return new ResponseEntity<StoryWordsDto>( data, HttpStatus.OK );
+	}
 
-        if( data == null ) {
-            throw new NotFoundException( storyKey );
-        }
-
-        return new ResponseEntity<StoryWordsDto>( data, HttpStatus.OK );
-    }
-
-    @ExceptionHandler( NotFoundException.class )
-    void handleNotFoundException( HttpServletResponse response, NotFoundException ex ) throws IOException {
-        response.sendError( HttpStatus.NOT_FOUND.value(),
-            String.format( "Story %s does not exist.", ex.getMessage() ) );
-    }
+	@ExceptionHandler( NotFoundException.class )
+	void handleNotFoundException( HttpServletResponse response, NotFoundException ex ) throws IOException
+	{
+		response.sendError( HttpStatus.NOT_FOUND.value(), String.format( "Story %s does not exist.", ex.getMessage() ) );
+	}
 }

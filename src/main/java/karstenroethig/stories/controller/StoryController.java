@@ -18,46 +18,46 @@ import karstenroethig.stories.controller.exceptions.NotFoundException;
 import karstenroethig.stories.dto.StoryShowDto;
 import karstenroethig.stories.service.StoryService;
 
-
 @ComponentScan
 @Controller
 @RequestMapping( "/story" )
-public class StoryController {
+public class StoryController
+{
+	@Autowired
+	StoryService storyService;
 
-    @Autowired
-    StoryService storyService;
+	@RequestMapping(
+		value = "/list",
+		method = RequestMethod.GET
+	)
+	public String list( Model model )
+	{
+		model.addAttribute( "allStories", storyService.getAllStories() );
 
-    @RequestMapping(
-        value = "/list",
-        method = RequestMethod.GET
-    )
-    public String list( Model model ) {
+		return "views/story/list";
+	}
 
-        model.addAttribute( "allStories", storyService.getAllStories() );
+	@RequestMapping(
+		value = "/show/{key}",
+		method = RequestMethod.GET
+	)
+	public String show( @PathVariable( "key" ) String storyKey, Model model ) throws NotFoundException
+	{
+		StoryShowDto story = storyService.findStory( storyKey );
 
-        return "views/story/list";
-    }
+		if ( story == null )
+		{
+			throw new NotFoundException( storyKey );
+		}
 
-    @RequestMapping(
-        value = "/show/{key}",
-        method = RequestMethod.GET
-    )
-    public String show( @PathVariable( "key" ) String storyKey, Model model ) throws NotFoundException {
+		model.addAttribute( "story", story );
 
-        StoryShowDto story = storyService.findStory( storyKey );
+		return "views/story/show";
+	}
 
-        if( story == null ) {
-            throw new NotFoundException( storyKey );
-        }
-
-        model.addAttribute( "story", story );
-
-        return "views/story/show";
-    }
-
-    @ExceptionHandler( NotFoundException.class )
-    void handleNotFoundException( HttpServletResponse response, NotFoundException ex ) throws IOException {
-        response.sendError( HttpStatus.NOT_FOUND.value(),
-            String.format( "Story %s does not exist.", ex.getMessage() ) );
-    }
+	@ExceptionHandler( NotFoundException.class )
+	void handleNotFoundException( HttpServletResponse response, NotFoundException ex ) throws IOException
+	{
+		response.sendError( HttpStatus.NOT_FOUND.value(), String.format( "Story %s does not exist.", ex.getMessage() ) );
+	}
 }
