@@ -7,7 +7,7 @@
 
 	<groupId>karstenroethig.stories</groupId>
 	<artifactId>stories-spring-boot</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
 	<name>Stories Spring Boot</name>
